@@ -29,10 +29,12 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "@types/elasticsearch": "^5.0.16",
     "@types/lodash": "^4.14.71",
     "@types/node": "^8.0.25",
     "ava": "^0.22.0",
     "codecov": "^2.3.0",
+    "elasticsearch": "^13.3.1",
     "nyc": "^11.1.0",
     "rimraf": "^2.6.1",
     "tslint": "^5.7.0",
