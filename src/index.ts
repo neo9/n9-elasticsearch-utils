@@ -1,7 +1,44 @@
 import * as _ from 'lodash'
+import * as elasticsearch from 'elasticsearch'
 
-export class N9ElasticSearchUtils {
-	constructor(private client, private log, private options?) {
+export default class N9ElasticSearchUtils {
+	constructor(private client, private log?, private options?) {
+	}
+
+	public async createIndice(indice, settings, mappings) {
+		const promises = [
+			`${indice}_1`,
+			`${indice}_2`
+		].map(async (index) => await this.createIndex(index, settings, mappings))
+
+		await Promise.all(promises)
+
+		const existsAlias = await this.client.indices.existsAlias({ name: indice })
+
+		if (!existsAlias) {
+			if (this.log) this.log(`Creating ${indice} alias pointing to ${indice}_1`)
+
+			return await this.client.indices.putAlias({
+				name: indice,
+				index: `${indice}_1`
+			})
+		}
+	}
+
+	public async createIndex(index, settings, mappings) {
+		const existsIndex = await this.client.indices.exists({ index })
+
+		if (existsIndex) return
+
+		if (this.log) this.log(`Creating ${index} index`)
+
+		return await this.client.indices.create({
+			index,
+			body: {
+				settings,
+				mappings
+			}
+		})
 	}
 
 	public async reindexIndice(indice) {
@@ -24,11 +61,11 @@ export class N9ElasticSearchUtils {
 		return unusedIndex
 	}
 
-	public async swapIndice(indice, next) {
+	public async swapIndice(indice) {
 		const usedIndex = await this.getUsedIndex(indice)
 		const unusedIndex = await this.getUnusedIndex(indice)
 
-		this.log(`Moving alias ${indice} from ${usedIndex} to ${unusedIndex}`)
+		if (this.log) this.log(`Moving alias ${indice} from ${usedIndex} to ${unusedIndex}`)
 
 		return await this.client.indices.updateAliases({
 			body: {
@@ -40,51 +77,17 @@ export class N9ElasticSearchUtils {
 		})
 	}
 
-	public async createIndice(indice, settings, mappings, next) {
-		const promises = [
-			`${indice}_1`,
-			`${indice}_2`
-		].map(async (index) => {
-			const existsIndex = await this.client.indices.exists({ index })
-
-			if (existsIndex) return
-
-			this.log(`Creating ${index} index`)
-
-			return await this.client.indices.create({
-				index,
-				body: {
-					settings,
-					mappings
-				}
-			})
-		})
-
-		await Promise.all(promises)
-
-		const existsAlias = await this.client.indices.existsAlias({ name: indice })
-
-		if (!existsAlias) {
-			this.log(`Creating ${indice} alias pointing to ${indice}_1`)
-
-			return await this.client.indices.putAlias({
-				name: indice,
-				index: `${indice}_1`
-			})
-		}
-	}
-
-	public async clearIndice(indice, settings, mappings, next) {
+	public async clearIndice(indice, settings, mappings) {
 		const usedIndex = await this.getUsedIndex(indice)
 		const unusedIndex = await this.getUnusedIndex(indice)
 
-		await this.clearIndex(unusedIndex, settings, mappings, next)
+		await this.clearIndex(unusedIndex, settings, mappings)
 
 		return unusedIndex
 	}
 
-	public async clearIndex(index, settings, mappings, next) {
-		this.log(`Clearing ${index} index`)
+	public async clearIndex(index, settings, mappings) {
+		if (this.log) this.log(`Clearing ${index} index`)
 
 		const exists = await this.client.indices.exists({ index })
 
@@ -99,7 +102,7 @@ export class N9ElasticSearchUtils {
 		})
 	}
 
-	public async refreshIndex(index, next) {
+	public async refreshIndex(index) {
 		return await this.client.indices.refresh({ index })
 	}
 
