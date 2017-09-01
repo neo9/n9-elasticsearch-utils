@@ -1,0 +1,44 @@
+{
+  "name": "@neo9/n9-elasticsearch-utils",
+  "version": "1.0.0",
+  "description": "ElasticSearch Utils Module",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/src"
+  ],
+  "nyc": {
+    "include": [
+      "dist/src/"
+    ]
+  },
+  "scripts": {
+    "build": "rimraf dist/ && tsc",
+    "lint": "tslint src/*.ts",
+    "test": "npm run lint && npm run build && nyc ava --verbose --serial dist/test/ && nyc report --reporter=html",
+    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "preversion": "npm test",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neo9/n9-elasticsearch-utils"
+  },
+  "author": "Benjamin Canac <benjamin.canac@neo9.fr>",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.71",
+    "@types/node": "^8.0.25",
+    "ava": "^0.22.0",
+    "codecov": "^2.3.0",
+    "nyc": "^11.1.0",
+    "rimraf": "^2.6.1",
+    "tslint": "^5.7.0",
+    "typescript": "^2.4.2"
+  },
+  "keywords": [
+    "elasticsearch utils"
+  ]
+}
