@@ -1,4 +1,6 @@
-# n9-elasticsearch-utils
+# No longer actively maintained
+
+## n9-elasticsearch-utils
 
 Neo9 ElasticSearch Utils Module.
 
@@ -7,7 +9,7 @@ Neo9 ElasticSearch Utils Module.
 [![Coverage](https://img.shields.io/codecov/c/github/neo9/n9-elasticsearch-utils/master.svg)](https://codecov.io/gh/neo9/n9-elasticsearch-utils)
 [![license](https://img.shields.io/github/license/neo9/n9-elasticsearch-utils.svg)](https://github.com/neo9/n9-elasticsearch-utils/blob/master/LICENSE)
 
-## Installation
+### Installation
 
 ```bash
 npm install --save @neo9/n9-elasticsearch-utils
